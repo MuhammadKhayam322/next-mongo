@@ -5,16 +5,15 @@ import { getUserIdFromRequest } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     await connectDB();
-    const { id } = await params; // Await the params promise
-    const product = await Product.findById(id);
+    const product = await Product.findById(req,params.id);
     
     if (!product) {
       return NextResponse.json(
-  
+        { error: "Product not found" },
         { status: 404 }
       );
     }
@@ -23,9 +22,9 @@ export async function GET(
       { product },
       { status: 200 }
     );
-  } catch {
-  
-
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error("Get product error:", errorMessage);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -35,7 +34,7 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     await connectDB();
@@ -43,16 +42,15 @@ export async function PUT(
     const userId = getUserIdFromRequest(req);
     if (!userId) {
       return NextResponse.json(
-      
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const { id } = await params; // Await the params promise
     const { name, description, price, category, inStock, image } = await req.json();
 
     const product = await Product.findByIdAndUpdate(
-      id,
+      params.id,
       {
         name,
         description,
@@ -66,23 +64,23 @@ export async function PUT(
 
     if (!product) {
       return NextResponse.json(
-      
+        { error: "Product not found" },
         { status: 404 }
       );
     }
 
     return NextResponse.json(
       {
-     
+        message: "Product updated successfully",
         product,
       },
       { status: 200 }
     );
-  } catch  {
-   
-   
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error("Update product error:", errorMessage);
     return NextResponse.json(
-    
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
@@ -90,7 +88,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     await connectDB();
@@ -98,16 +96,16 @@ export async function DELETE(
     const userId = getUserIdFromRequest(req);
     if (!userId) {
       return NextResponse.json(
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const { id } = await params; // Await the params promise
-    const product = await Product.findByIdAndDelete(id);
+    const product = await Product.findByIdAndDelete(params.id);
 
     if (!product) {
       return NextResponse.json(
-      
+        { error: "Product not found" },
         { status: 404 }
       );
     }
@@ -116,9 +114,12 @@ export async function DELETE(
       { message: "Product deleted successfully" },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     console.error("Delete product error:", errorMessage);
-   
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
