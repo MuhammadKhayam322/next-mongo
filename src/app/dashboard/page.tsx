@@ -33,7 +33,7 @@ export default function Dashboard() {
   useEffect(() => {
     fetchUser();
     fetchProducts();
-  }, []);
+  });
 
   const fetchUser = async () => {
     try {
@@ -44,8 +44,8 @@ export default function Dashboard() {
       } else {
         router.push('/login');
       }
-    } catch (error) {
-      console.error('Error fetching user:', error);
+    } catch {
+    
       router.push('/login');
     }
   };
@@ -71,10 +71,8 @@ export default function Dashboard() {
       } else {
         setError('Failed to fetch products');
       }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setError('An error occurred while fetching products');
-    } finally {
+    } 
+    finally {
       setLoading(false);
     }
   };
@@ -87,13 +85,10 @@ export default function Dashboard() {
 
       if (response.ok) {
         setProducts(products.filter(product => product._id !== id));
-      } else {
-        console.error('Failed to delete product');
-        setError('Failed to delete product');
-      }
-    } catch (error) {
-      console.error('Error deleting product:', error);
-      setError('An error occurred while deleting the product');
+      } 
+    } catch  {
+      
+      
     }
   };
 

@@ -68,8 +68,6 @@ export default function ProductForm({ product, onCancel, onSuccess }: ProductFor
         const data = await response.json();
         setError(data.error || 'An error occurred');
       }
-    } catch (error) {
-      setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }

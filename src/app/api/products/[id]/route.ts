@@ -14,7 +14,7 @@ export async function GET(
     
     if (!product) {
       return NextResponse.json(
-        { error: "Product not found" },
+  
         { status: 404 }
       );
     }
@@ -25,7 +25,7 @@ export async function GET(
     );
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    console.error("Get product error:", errorMessage);
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -43,7 +43,7 @@ export async function PUT(
     const userId = getUserIdFromRequest(req);
     if (!userId) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+      
         { status: 401 }
       );
     }
@@ -66,14 +66,14 @@ export async function PUT(
 
     if (!product) {
       return NextResponse.json(
-        { error: "Product not found" },
+      
         { status: 404 }
       );
     }
 
     return NextResponse.json(
       {
-        message: "Product updated successfully",
+     
         product,
       },
       { status: 200 }
@@ -117,12 +117,8 @@ export async function DELETE(
       { message: "Product deleted successfully" },
       { status: 200 }
     );
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    console.error("Delete product error:", errorMessage);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+  } catch (error) {
+  
+   
   }
 }

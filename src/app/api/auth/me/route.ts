@@ -33,8 +33,8 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json({ user }, { status: 200 });
-  } catch (error: any) {
-    console.error("Me endpoint error:", error);
+  } catch (error) {
+    console.error("Me endpoint error:");
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

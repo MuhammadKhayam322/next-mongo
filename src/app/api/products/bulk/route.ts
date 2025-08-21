@@ -33,8 +33,8 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
-    console.error("Bulk create products error:", error);
+  } catch (error) {
+    console.error("Bulk create products error:");
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
