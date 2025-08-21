@@ -11,7 +11,7 @@ export async function GET(req: Request) {
     
     if (!token) {
       return NextResponse.json(
-        { error: "Not authenticated" },
+        
         { status: 401 }
       );
     }
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     const decoded = verifyToken(token);
     if (!decoded) {
       return NextResponse.json(
-        { error: "Invalid token" },
+        
         { status: 401 }
       );
     }
@@ -27,16 +27,16 @@ export async function GET(req: Request) {
     const user = await User.findById(decoded.userId).select('-password');
     if (!user) {
       return NextResponse.json(
-        { error: "User not found" },
+        
         { status: 404 }
       );
     }
 
     return NextResponse.json({ user }, { status: 200 });
-  } catch (error) {
-    console.error("Me endpoint error:");
+  } catch {
+    
     return NextResponse.json(
-      { error: "Internal server error" },
+     
       { status: 500 }
     );
   }

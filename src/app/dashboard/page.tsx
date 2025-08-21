@@ -1,9 +1,11 @@
 'use client';
-import Image from 'next/image';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '@/components/LogoutButton';
-import ProductForm from '@/components/ProductForm';
+import ProductForm from '../../components/ProductForm';
+import SignupPage from '../signup/page';
+
 
 interface User {
   _id: string;
@@ -26,14 +28,12 @@ export default function Dashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const router = useRouter();
 
   useEffect(() => {
     fetchUser();
     fetchProducts();
-  });
+  }, []);
 
   const fetchUser = async () => {
     try {
@@ -44,36 +44,21 @@ export default function Dashboard() {
       } else {
         router.push('/login');
       }
-    } catch {
-    
+    } catch (error) {
+      console.error('Error fetching user:', error);
       router.push('/login');
     }
   };
 
   const fetchProducts = async () => {
     try {
-      setLoading(true);
       const response = await fetch('/api/products');
       if (response.ok) {
         const data = await response.json();
-        
-        // Ensure all products have proper price values
-        const validatedProducts = data.products.map((product: any) => ({
-          ...product,
-          price: product.price || 0,
-          description: product.description || '',
-          category: product.category || 'Uncategorized',
-          inStock: product.inStock !== undefined ? product.inStock : true,
-          image: product.image || '',
-        }));
-        
-        setProducts(validatedProducts);
-      } else {
-        setError('Failed to fetch products');
+        setProducts(data.products);
       }
-    } 
-    finally {
-      setLoading(false);
+    } catch  {
+   
     }
   };
 
@@ -85,9 +70,10 @@ export default function Dashboard() {
 
       if (response.ok) {
         setProducts(products.filter(product => product._id !== id));
-      } 
-    } catch  {
-      
+      } else {
+        console.error('Failed to delete product');
+      }
+    } catch {
       
     }
   };
@@ -130,12 +116,6 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-
         {showProductForm && (
           <ProductForm
             product={editingProduct || undefined}
@@ -147,68 +127,56 @@ export default function Dashboard() {
           />
         )}
 
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading products...</p>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                  {product.image && (
-                    <Image
-                      width={300}
-                      height={200}
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-48 object-cover"
-                    />
-                  )}
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold mb-2">{product.name || 'Unnamed Product'}</h3>
-                    <p className="text-gray-600 mb-2">{product.description || 'No description available'}</p>
-                    <p className="text-gray-800 font-bold mb-2">
-                      ${(product.price || 0).toFixed(2)}
-                    </p>
-                    <p className="text-gray-600 mb-2">Category: {product.category || 'Uncategorized'}</p>
-                    <p className="mb-4">
-                      Status:{" "}
-                      <span
-                        className={`inline-block px-2 py-1 rounded text-xs ${
-                          product.inStock
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {product.inStock ? "In Stock" : "Out of Stock"}
-                      </span>
-                    </p>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleEditProduct(product)}
-                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product._id)}
-                        className="px-3 py-1 bg-red-600 text-white rounded text-sm"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => (
+            <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              {product.image && (
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-48 object-cover"
+                />
+              )}
+              <div className="p-4">
+                <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+                <p className="text-gray-600 mb-2">{product.description}</p>
+                <p className="text-gray-800 font-bold mb-2">${product.price.toFixed(2)}</p>
+                <p className="text-gray-600 mb-2">Category: {product.category}</p>
+                <p className="mb-4">
+                  Status:{" "}
+                  <span
+                    className={`inline-block px-2 py-1 rounded text-xs ${
+                      product.inStock
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {product.inStock ? "In Stock" : "Out of Stock"}
+                  </span>
+                </p>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleEditProduct(product)}
+                    className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProduct(product._id)}
+                    className="px-3 py-1 bg-red-600 text-white rounded text-sm"
+                  >
+                    Delete
+                  </button>
                 </div>
-              ))}
-            </div>
-
-            {products.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-500">No products found.</p>
               </div>
-            )}
-          </>
+            </div>
+          ))}
+        </div>
+         <SignupPage/>
+        {products.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No products found.</p>
+          </div>
         )}
       </main>
     </div>

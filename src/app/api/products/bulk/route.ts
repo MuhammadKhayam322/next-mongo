@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     if (!products || !Array.isArray(products)) {
       return NextResponse.json(
-        { error: "Products array is required" },
+       
         { status: 400 }
       );
     }
@@ -33,10 +33,10 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error) {
-    console.error("Bulk create products error:");
+  } catch  {
+   
     return NextResponse.json(
-      { error: "Internal server error" },
+    
       { status: 500 }
     );
   }

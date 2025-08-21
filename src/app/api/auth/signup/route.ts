@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "All fields are required" },
+      
         { status: 400 }
       );
     }
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
-        { error: "User already exists" },
+       
         { status: 409 }
       );
     }
@@ -41,10 +41,10 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error) {
-    console.error( error);
+  } catch  {
+ 
     return NextResponse.json(
-      { error: "Internal server error" },
+     
       { status: 500 }
     );
   }

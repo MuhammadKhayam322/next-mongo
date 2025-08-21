@@ -23,8 +23,8 @@ export async function GET(
       { product },
       { status: 200 }
     );
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+  } catch {
+  
 
     return NextResponse.json(
       { error: "Internal server error" },
@@ -78,11 +78,11 @@ export async function PUT(
       },
       { status: 200 }
     );
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    console.error("Update product error:", errorMessage);
+  } catch  {
+   
+   
     return NextResponse.json(
-      { error: "Internal server error" },
+    
       { status: 500 }
     );
   }
@@ -98,7 +98,6 @@ export async function DELETE(
     const userId = getUserIdFromRequest(req);
     if (!userId) {
       return NextResponse.json(
-        { error: "Unauthorized" },
         { status: 401 }
       );
     }
@@ -108,7 +107,7 @@ export async function DELETE(
 
     if (!product) {
       return NextResponse.json(
-        { error: "Product not found" },
+      
         { status: 404 }
       );
     }
@@ -118,7 +117,8 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error) {
-  
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error("Delete product error:", errorMessage);
    
   }
 }

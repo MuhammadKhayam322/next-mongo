@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+      
         { status: 400 }
       );
     }
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return NextResponse.json(
-        { error: "Invalid credentials" },
+       
         { status: 401 }
       );
     }
@@ -57,10 +57,8 @@ export async function POST(req: Request) {
 
     return response;
   }
-   catch (error) {
-    console.error("Login error:");
-    return NextResponse.json(
-      { error: "Internal server error" },
+   catch  {
+    return NextResponse.json( 
       { status: 500 }
     );
   }
