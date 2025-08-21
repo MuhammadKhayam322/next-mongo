@@ -5,11 +5,12 @@ import { getUserIdFromRequest } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const product = await Product.findById(req,params.id);
+    const { id } = await params; // Await the params promise
+    const product = await Product.findById(id);
     
     if (!product) {
       return NextResponse.json(
@@ -34,7 +35,7 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -47,10 +48,11 @@ export async function PUT(
       );
     }
 
+    const { id } = await params; // Await the params promise
     const { name, description, price, category, inStock, image } = await req.json();
 
     const product = await Product.findByIdAndUpdate(
-      params.id,
+      id,
       {
         name,
         description,
@@ -88,7 +90,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -101,7 +103,8 @@ export async function DELETE(
       );
     }
 
-    const product = await Product.findByIdAndDelete(params.id);
+    const { id } = await params; // Await the params promise
+    const product = await Product.findByIdAndDelete(id);
 
     if (!product) {
       return NextResponse.json(
