@@ -3,7 +3,7 @@ import connectDB from "@/lib/db";
 import Product from "@/models/Product";
 import { getUserIdFromRequest } from "@/lib/auth";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     await connectDB();
     const products = await Product.find({});
