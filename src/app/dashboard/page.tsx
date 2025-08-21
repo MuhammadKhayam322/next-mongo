@@ -1,11 +1,9 @@
 'use client';
-
-import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '@/components/LogoutButton';
 import ProductForm from '../../components/ProductForm';
-import SignupPage from '../signup/page';
-
 
 interface User {
   _id: string;
@@ -28,14 +26,11 @@ export default function Dashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchUser();
-    fetchProducts();
-  }, []);
-
-  const fetchUser = async () => {
+  // Memoize fetchUser with useCallback
+  const fetchUser = useCallback(async () => {
     try {
       const response = await fetch('/api/auth/me');
       if (response.ok) {
@@ -47,20 +42,28 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error fetching user:', error);
       router.push('/login');
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [router]);
 
-  const fetchProducts = async () => {
+  // Memoize fetchProducts with useCallback
+  const fetchProducts = useCallback(async () => {
     try {
       const response = await fetch('/api/products');
       if (response.ok) {
         const data = await response.json();
         setProducts(data.products);
       }
-    } catch  {
-   
+    } catch (error) {
+      console.error('Error fetching products:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchUser();
+    fetchProducts();
+  }, [fetchUser, fetchProducts]);
 
   const handleDeleteProduct = async (id: string) => {
     try {
@@ -73,8 +76,8 @@ export default function Dashboard() {
       } else {
         console.error('Failed to delete product');
       }
-    } catch {
-      
+    } catch (error) {
+      console.error('Error deleting product:', error);
     }
   };
 
@@ -89,8 +92,12 @@ export default function Dashboard() {
     fetchProducts();
   };
 
-  if (!user) {
+  if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (!user) {
+    return <div className="min-h-screen flex items-center justify-center">Please log in to access the dashboard</div>;
   }
 
   return (
@@ -131,7 +138,9 @@ export default function Dashboard() {
           {products.map((product) => (
             <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden">
               {product.image && (
-                <img
+                <Image
+                  height={200}
+                  width={300}
                   src={product.image}
                   alt={product.name}
                   className="w-full h-48 object-cover"
@@ -172,7 +181,7 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
-         <SignupPage/>
+
         {products.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500">No products found.</p>
