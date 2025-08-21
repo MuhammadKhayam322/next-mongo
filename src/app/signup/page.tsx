@@ -38,10 +38,13 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (response.ok) {
+        // Redirect to dashboard on successful signup
         router.push('/dashboard');
       } else {
         setError(data.error);
       }
+    } catch {
+      setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -72,7 +75,7 @@ export default function SignupPage() {
                 type="text"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Name"
+                placeholder="Full name"
                 value={formData.name}
                 onChange={handleChange}
               />
@@ -124,7 +127,7 @@ export default function SignupPage() {
               href="/login" 
               className="text-blue-600 hover:text-blue-800"
             >
-              Already have an account? Sign in
+              Already have an account?
             </Link>
           </div>
         </form>
