@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
 import { getUserIdFromRequest } from "@/lib/auth";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -22,8 +22,9 @@ export async function GET(
       { product },
       { status: 200 }
     );
-  } catch (error: any) {
-    console.error("Get product error:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error("Get product error:", errorMessage);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -32,13 +33,13 @@ export async function GET(
 }
 
 export async function PUT(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     await connectDB();
     
-    const userId = getUserIdFromRequest(req as any);
+    const userId = getUserIdFromRequest(req);
     if (!userId) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -75,8 +76,9 @@ export async function PUT(
       },
       { status: 200 }
     );
-  } catch (error: any) {
-    console.error("Update product error:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error("Update product error:", errorMessage);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -85,13 +87,13 @@ export async function PUT(
 }
 
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     await connectDB();
     
-    const userId = getUserIdFromRequest(req as any);
+    const userId = getUserIdFromRequest(req);
     if (!userId) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -112,8 +114,9 @@ export async function DELETE(
       { message: "Product deleted successfully" },
       { status: 200 }
     );
-  } catch (error: any) {
-    console.error("Delete product error:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error("Delete product error:", errorMessage);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
