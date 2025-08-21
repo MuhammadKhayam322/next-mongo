@@ -1,55 +1,51 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
 import { getUserIdFromRequest } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     await connectDB();
     const products = await Product.find({});
-
+    
     return NextResponse.json(
       { products },
       { status: 200 }
     );
-  } catch {
-    
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error("Get products error:", errorMessage);
     return NextResponse.json(
-    
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await connectDB();
-
-    const userId = getUserIdFromRequest(req as any);
+    
+    const userId = getUserIdFromRequest(req);
     if (!userId) {
       return NextResponse.json(
-
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const { name, description, price, category, inStock, } = await req.json();
+    const { name, description, price, category, inStock, image } = await req.json();
 
-    if (!name || !price || !category) {
-      return NextResponse.json(
-
-        { status: 400 }
-      );
-    }
-
-    const product = await Product.create({
+    const product = new Product({
       name,
       description,
       price,
       category,
-      inStock: inStock !== undefined ? inStock : true,
-
+      inStock,
+      image,
     });
+
+    await product.save();
 
     return NextResponse.json(
       {
@@ -58,10 +54,11 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch {
-
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error("Create product error:", errorMessage);
     return NextResponse.json(
-
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
