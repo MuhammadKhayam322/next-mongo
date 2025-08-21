@@ -1,5 +1,5 @@
 'use client';
-
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '@/components/LogoutButton';
@@ -162,7 +162,9 @@ export default function Dashboard() {
               {products.map((product) => (
                 <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden">
                   {product.image && (
-                    <img
+                    <Image
+                      width={300}
+                      height={200}
                       src={product.image}
                       alt={product.name}
                       className="w-full h-48 object-cover"
